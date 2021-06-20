@@ -13,6 +13,16 @@ public class EnrollCtrl {
         checkForNotTakingSameExamTime(courses);
         checkForNotTakingTheSameCourseTwice(courses);
         int unitsRequested = calculateRequestedUnits(courses);
+        double gpa = calculateGPA(transcript);
+        if ((gpa < 12 && unitsRequested > 14) ||
+                (gpa < 16 && unitsRequested > 16) ||
+                (unitsRequested > 20))
+            throw new EnrollmentRulesViolationException(String.format("Number of units (%d) requested does not match GPA of %f", unitsRequested, gpa));
+        for (CSE o : courses)
+            s.takeCourse(o.getCourse(), o.getSection());
+    }
+
+    private double calculateGPA(Map<Term, Map<Course, Double>> transcript) {
         double points = 0;
         int totalUnits = 0;
         for (Map.Entry<Term, Map<Course, Double>> tr : transcript.entrySet()) {
@@ -21,13 +31,7 @@ public class EnrollCtrl {
                 totalUnits += r.getKey().getUnits();
             }
         }
-        double gpa = points / totalUnits;
-        if ((gpa < 12 && unitsRequested > 14) ||
-                (gpa < 16 && unitsRequested > 16) ||
-                (unitsRequested > 20))
-            throw new EnrollmentRulesViolationException(String.format("Number of units (%d) requested does not match GPA of %f", unitsRequested, gpa));
-        for (CSE o : courses)
-            s.takeCourse(o.getCourse(), o.getSection());
+        return points / totalUnits;
     }
 
     private int calculateRequestedUnits(List<CSE> courses) {
