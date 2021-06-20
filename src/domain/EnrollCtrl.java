@@ -35,6 +35,12 @@ public class EnrollCtrl {
                     continue;
                 if (o.getExamTime().equals(o2.getExamTime()))
                     throw new EnrollmentRulesViolationException(String.format("Two offerings %s and %s have the same exam time", o, o2));
+            }
+        }
+        for (CSE o : courses) {
+            for (CSE o2 : courses) {
+                if (o == o2)
+                    continue;
                 if (o.getCourse().equals(o2.getCourse()))
                     throw new EnrollmentRulesViolationException(String.format("%s is requested to be taken twice", o.getCourse().getName()));
             }
