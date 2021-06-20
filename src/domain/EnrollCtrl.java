@@ -7,17 +7,17 @@ import domain.exceptions.EnrollmentRulesViolationException;
 
 public class EnrollCtrl {
     public void enroll(Student s, List<CSE> courses) throws EnrollmentRulesViolationException {
-        Map<Term, Map<Course, Double>> transcript = s.getTranscript();
-        checkForTakingPassedCourses(courses, transcript);
-        checkForPassingAllPrerequisites(courses, transcript);
+        checkForTakingPassedCourses(courses, s);
+        checkForPassingAllPrerequisites(courses, s);
         checkForNotTakingSameExamTime(courses);
         checkForNotTakingTheSameCourseTwice(courses);
-        checkForTakingUnitsRequestLimit(courses, transcript);
+        checkForTakingUnitsRequestLimit(courses, s);
         for (CSE o : courses)
             s.takeCourse(o.getCourse(), o.getSection());
     }
 
-    private void checkForTakingUnitsRequestLimit(List<CSE> courses, Map<Term, Map<Course, Double>> transcript) throws EnrollmentRulesViolationException {
+    private void checkForTakingUnitsRequestLimit(List<CSE> courses, Student s) throws EnrollmentRulesViolationException {
+        Map<Term, Map<Course, Double>> transcript = s.getTranscript();
         int unitsRequested = calculateRequestedUnits(courses);
         double gpa = calculateGPA(transcript);
         if ((gpa < 12 && unitsRequested > 14) ||
@@ -67,7 +67,8 @@ public class EnrollCtrl {
         }
     }
 
-    private void checkForPassingAllPrerequisites(List<CSE> courses, Map<Term, Map<Course, Double>> transcript) throws EnrollmentRulesViolationException {
+    private void checkForPassingAllPrerequisites(List<CSE> courses, Student s) throws EnrollmentRulesViolationException {
+        Map<Term, Map<Course, Double>> transcript = s.getTranscript();
         for (CSE o : courses) {
             List<Course> prereqs = o.getCourse().getPrerequisites();
             nextPre:
@@ -83,7 +84,8 @@ public class EnrollCtrl {
         }
     }
 
-    private void checkForTakingPassedCourses(List<CSE> courses, Map<Term, Map<Course, Double>> transcript) throws EnrollmentRulesViolationException {
+    private void checkForTakingPassedCourses(List<CSE> courses, Student s) throws EnrollmentRulesViolationException {
+        Map<Term, Map<Course, Double>> transcript = s.getTranscript();
         for (CSE o : courses) {
             for (Map.Entry<Term, Map<Course, Double>> tr : transcript.entrySet()) {
                 for (Map.Entry<Course, Double> r : tr.getValue().entrySet()) {
