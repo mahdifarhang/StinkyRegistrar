@@ -26,10 +26,7 @@ public class EnrollCtrl {
     }
 
     private int calculateRequestedUnits(List<CSE> courses) {
-        int unitsRequested = 0;
-        for (CSE o : courses)
-            unitsRequested += o.getCourse().getUnits();
-        return unitsRequested;
+        return courses.stream().mapToInt(c -> c.getCourse().getUnits()).sum();
     }
 
     private void checkForNotTakingTheSameCourseTwice(List<CSE> courses) throws EnrollmentRulesViolationException {
