@@ -12,14 +12,18 @@ public class EnrollCtrl {
         checkForPassingAllPrerequisites(courses, transcript);
         checkForNotTakingSameExamTime(courses);
         checkForNotTakingTheSameCourseTwice(courses);
+        checkForTakingUnitsRequestLimit(courses, transcript);
+        for (CSE o : courses)
+            s.takeCourse(o.getCourse(), o.getSection());
+    }
+
+    private void checkForTakingUnitsRequestLimit(List<CSE> courses, Map<Term, Map<Course, Double>> transcript) throws EnrollmentRulesViolationException {
         int unitsRequested = calculateRequestedUnits(courses);
         double gpa = calculateGPA(transcript);
         if ((gpa < 12 && unitsRequested > 14) ||
                 (gpa < 16 && unitsRequested > 16) ||
                 (unitsRequested > 20))
             throw new EnrollmentRulesViolationException(String.format("Number of units (%d) requested does not match GPA of %f", unitsRequested, gpa));
-        for (CSE o : courses)
-            s.takeCourse(o.getCourse(), o.getSection());
     }
 
     private double calculateGPA(Map<Term, Map<Course, Double>> transcript) {
