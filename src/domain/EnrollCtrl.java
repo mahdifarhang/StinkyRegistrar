@@ -9,12 +9,10 @@ public class EnrollCtrl {
     public void enroll(Student s, List<CSE> courses) throws EnrollmentRulesViolationException {
         Map<Term, Map<Course, Double>> transcript = s.getTranscript();
         checkForTakingPassedCourses(courses, transcript);
-        checkForPassingAllPrequisites(courses, transcript);
+        checkForPassingAllPrerequisites(courses, transcript);
         checkForNotTakingSameExamTime(courses);
-        chckForNotTakingTheSameCourseTwice(courses);
-        int unitsRequested = 0;
-        for (CSE o : courses)
-            unitsRequested += o.getCourse().getUnits();
+        checkForNotTakingTheSameCourseTwice(courses);
+        int unitsRequested = calculateRequestedUnits(courses);
         double points = 0;
         int totalUnits = 0;
         for (Map.Entry<Term, Map<Course, Double>> tr : transcript.entrySet()) {
@@ -32,7 +30,14 @@ public class EnrollCtrl {
             s.takeCourse(o.getCourse(), o.getSection());
     }
 
-    private void chckForNotTakingTheSameCourseTwice(List<CSE> courses) throws EnrollmentRulesViolationException {
+    private int calculateRequestedUnits(List<CSE> courses) {
+        int unitsRequested = 0;
+        for (CSE o : courses)
+            unitsRequested += o.getCourse().getUnits();
+        return unitsRequested;
+    }
+
+    private void checkForNotTakingTheSameCourseTwice(List<CSE> courses) throws EnrollmentRulesViolationException {
         for (CSE o : courses) {
             for (CSE o2 : courses) {
                 if (o == o2)
@@ -54,7 +59,7 @@ public class EnrollCtrl {
         }
     }
 
-    private void checkForPassingAllPrequisites(List<CSE> courses, Map<Term, Map<Course, Double>> transcript) throws EnrollmentRulesViolationException {
+    private void checkForPassingAllPrerequisites(List<CSE> courses, Map<Term, Map<Course, Double>> transcript) throws EnrollmentRulesViolationException {
         for (CSE o : courses) {
             List<Course> prereqs = o.getCourse().getPrerequisites();
             nextPre:
