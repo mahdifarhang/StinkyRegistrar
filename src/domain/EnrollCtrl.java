@@ -19,10 +19,14 @@ public class EnrollCtrl {
     private void checkForTakingUnitsRequestLimit(List<CSE> courses, Student student) throws EnrollmentRulesViolationException {
         int unitsRequested = courses.stream().mapToInt(c -> c.getCourse().getUnits()).sum();
         double gpa = student.calculateGPA();
-        if ((gpa < 12 && unitsRequested > 14) ||
-                (gpa < 16 && unitsRequested > 16) ||
-                (unitsRequested > 20))
+        if (validatedUnitsRequest(unitsRequested, gpa))
             throw new EnrollmentRulesViolationException(String.format("Number of units (%d) requested does not match GPA of %f", unitsRequested, gpa));
+    }
+
+    private boolean validatedUnitsRequest(int requested, double gpa) {
+        return (gpa < 12 && requested > 14) ||
+                (gpa < 16 && requested > 16) ||
+                (requested > 20);
     }
 
     private void checkForNotTakingTheSameCourseTwice(List<CSE> courses) throws EnrollmentRulesViolationException {
