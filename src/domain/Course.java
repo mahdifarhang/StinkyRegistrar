@@ -17,12 +17,12 @@ public class Course {
 		prerequisites = new ArrayList<Course>();
 	}
 	
-	public void addPre(Course c) {
-		getPrerequisites().add(c);
+	public void addPre(Course course) {
+		getPrerequisites().add(course);
 	}
 
-	public Course withPre(Course... pres) {
-		prerequisites.addAll(Arrays.asList(pres));
+	public Course withPre(Course... courses) {
+		prerequisites.addAll(Arrays.asList(courses));
 		return this;
 	}
 
@@ -31,15 +31,15 @@ public class Course {
 	}
 
 	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		sb.append(name);
-		sb.append(" {");
+		StringBuilder stringBuilder = new StringBuilder();
+		stringBuilder.append(name);
+		stringBuilder.append(" {");
 		for (Course pre : getPrerequisites()) {
-			sb.append(pre.getName());
-			sb.append(", ");
+			stringBuilder.append(pre.getName());
+			stringBuilder.append(", ");
 		}
-		sb.append("}");
-		return sb.toString();
+		stringBuilder.append("}");
+		return stringBuilder.toString();
 	}
 
 	public String getName() {

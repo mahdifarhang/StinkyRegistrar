@@ -26,8 +26,8 @@ public class Student {
 		this.currentTerm = new ArrayList<>();
 	}
 	
-	public void takeCourse(Course c, int section) {
-		currentTerm.add(new CourseSection(c, section));
+	public void takeCourse(Course _course, int section) {
+		currentTerm.add(new CourseSection(_course, section));
 	}
 
 	public Map<Term, Map<Course, Double>> getTranscript() {
@@ -43,10 +43,10 @@ public class Student {
 	public double calculateGPA() {
 		double points = 0;
 		int totalUnits = 0;
-		for (Map.Entry<Term, Map<Course, Double>> tr : transcript.entrySet()) {
-			for (Map.Entry<Course, Double> r : tr.getValue().entrySet()) {
-				points += r.getValue() * r.getKey().getUnits();
-				totalUnits += r.getKey().getUnits();
+		for (Map.Entry<Term, Map<Course, Double>> term : transcript.entrySet()) {
+			for (Map.Entry<Course, Double> course : term.getValue().entrySet()) {
+				points += course.getValue() * course.getKey().getUnits();
+				totalUnits += course.getKey().getUnits();
 			}
 		}
 		return points / totalUnits;
