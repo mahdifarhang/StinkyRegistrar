@@ -52,10 +52,10 @@ public class Student {
 		return points / totalUnits;
 	}
 
-	public boolean hasPassed(CSE course) {
+	public boolean hasPassed(Course course) {
 		for (Map.Entry<Term, Map<Course, Double>> term : getTranscript().entrySet()) {
 			for (Map.Entry<Course, Double> termCourse : term.getValue().entrySet()) {
-				if (termCourse.getKey().equals(course.getCourse()) && termCourse.getValue() >= 10)
+				if (termCourse.getKey().equals(course) && termCourse.getValue() >= 10)
 					return true;
 			}
 		}
