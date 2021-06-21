@@ -1,5 +1,7 @@
 package domain;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import domain.exceptions.EnrollmentRulesViolationException;
@@ -12,21 +14,27 @@ public class EnrollCtrl {
     public static final int GOOD_STUDENT_GPA = 16;
     public static final int NOT_GOOD_STUDENTS_LIMIT_UNITS = 16;
 
-    public void enroll(Student student, List<CSE> courses) throws EnrollmentRulesViolationException {
-        checkForTakingPassedCourses(courses, student);
-        checkForPassingAllPrerequisites(courses, student);
-        checkForNotTakingSameExamTime(courses);
-        checkForNotTakingTheSameCourseTwice(courses);
-        checkForTakingUnitsRequestLimit(courses, student);
+    public List<EnrollmentRulesViolationException> enroll(Student student, List<CSE> courses) {
+        List<EnrollmentRulesViolationException> violations = new ArrayList<>();
+        violations.add(checkForTakingPassedCourses(courses, student));
+        violations.add(checkForPassingAllPrerequisites(courses, student));
+        violations.add(checkForNotTakingSameExamTime(courses));
+        violations.add(checkForNotTakingTheSameCourseTwice(courses));
+        violations.add(checkForTakingUnitsRequestLimit(courses, student));
+        violations.removeAll(Collections.singleton(null));
+        if (!violations.isEmpty())
+            return violations;
         for (CSE course : courses)
             student.takeCourse(course.getCourse(), course.getSection());
+        return null;
     }
 
-    private void checkForTakingUnitsRequestLimit(List<CSE> courses, Student student) throws EnrollmentRulesViolationException {
+    private EnrollmentRulesViolationException checkForTakingUnitsRequestLimit(List<CSE> courses, Student student) {
         int unitsRequested = courses.stream().mapToInt(c -> c.getCourse().getUnits()).sum();
         double gpa = student.calculateGPA();
         if (validatedUnitsRequest(unitsRequested, gpa))
-            throw new EnrollmentRulesViolationException(String.format("Number of units (%d) requested does not match GPA of %f", unitsRequested, gpa));
+            return new EnrollmentRulesViolationException(String.format("Number of units (%d) requested does not match GPA of %f", unitsRequested, gpa));
+        return null;
     }
 
     private boolean validatedUnitsRequest(int requested, double gpa) {
@@ -35,38 +43,42 @@ public class EnrollCtrl {
                 (requested > UNCONDITIONAL_MAX_UNITS_LIMIT);
     }
 
-    private void checkForNotTakingTheSameCourseTwice(List<CSE> courses) throws EnrollmentRulesViolationException {
+    private EnrollmentRulesViolationException checkForNotTakingTheSameCourseTwice(List<CSE> courses) {
         for (CSE course1 : courses) {
             for (CSE course2 : courses) {
                 if (course1 != course2 && course1.getCourse().equals(course2.getCourse()))
-                    throw new EnrollmentRulesViolationException(String.format("%s is requested to be taken twice", course1.getCourse().getName()));
+                    return new EnrollmentRulesViolationException(String.format("%s is requested to be taken twice", course1.getCourse().getName()));
             }
         }
+        return null;
     }
 
-    private void checkForNotTakingSameExamTime(List<CSE> courses) throws EnrollmentRulesViolationException {
+    private EnrollmentRulesViolationException checkForNotTakingSameExamTime(List<CSE> courses) {
         for (CSE course1 : courses) {
             for (CSE course2 : courses) {
                 if (course1 != course2 && course1.getExamTime().equals(course2.getExamTime()))
-                    throw new EnrollmentRulesViolationException(String.format("Two offerings %s and %s have the same exam time", course1, course2));
+                    return new EnrollmentRulesViolationException(String.format("Two offerings %s and %s have the same exam time", course1, course2));
             }
         }
+        return null;
     }
 
-    private void checkForPassingAllPrerequisites(List<CSE> courses, Student student) throws EnrollmentRulesViolationException {
+    private EnrollmentRulesViolationException checkForPassingAllPrerequisites(List<CSE> courses, Student student) {
         for (CSE course : courses) {
             List<Course> prerequisites = course.getCourse().getPrerequisites();
             for (Course prerequisite : prerequisites) {
                 if (!student.hasPassed(prerequisite))
-                    throw new EnrollmentRulesViolationException(String.format("The student has not passed %s as a prerequisite of %s", prerequisite.getName(), course.getCourse().getName()));
+                    return new EnrollmentRulesViolationException(String.format("The student has not passed %s as a prerequisite of %s", prerequisite.getName(), course.getCourse().getName()));
             }
         }
+        return null;
     }
 
-    private void checkForTakingPassedCourses(List<CSE> courses, Student student) throws EnrollmentRulesViolationException {
+    private EnrollmentRulesViolationException checkForTakingPassedCourses(List<CSE> courses, Student student) {
         for (CSE course : courses) {
             if (student.hasPassed(course.getCourse()))
-                throw new EnrollmentRulesViolationException(String.format("The student has already passed %s", course.getCourse().getName()));
+                return new EnrollmentRulesViolationException(String.format("The student has already passed %s", course.getCourse().getName()));
         }
+        return null;
     }
 }
