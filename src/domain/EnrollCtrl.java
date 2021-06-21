@@ -69,14 +69,9 @@ public class EnrollCtrl {
     }
 
     private void checkForTakingPassedCourses(List<CSE> courses, Student student) throws EnrollmentRulesViolationException {
-        Map<Term, Map<Course, Double>> transcript = student.getTranscript();
         for (CSE course : courses) {
-            for (Map.Entry<Term, Map<Course, Double>> term : transcript.entrySet()) {
-                for (Map.Entry<Course, Double> termCourse : term.getValue().entrySet()) {
-                    if (termCourse.getKey().equals(course.getCourse()) && termCourse.getValue() >= 10)
-                        throw new EnrollmentRulesViolationException(String.format("The student has already passed %s", course.getCourse().getName()));
-                }
-            }
+            if (student.hasPassed(course))
+                throw new EnrollmentRulesViolationException(String.format("The student has already passed %s", course.getCourse().getName()));
         }
     }
 }
