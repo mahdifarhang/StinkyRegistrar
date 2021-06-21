@@ -1,11 +1,17 @@
 package domain;
 
 import java.util.List;
-import java.util.Map;
 
 import domain.exceptions.EnrollmentRulesViolationException;
 
 public class EnrollCtrl {
+
+    public static final int FAILED_TERM_GPA = 12;
+    public static final int FAILED_TERM_LIMIT_UNITS = 14;
+    public static final int UNCONDITIONAL_MAX_UNITS_LIMIT = 20;
+    public static final int GOOD_STUDENT_GPA = 16;
+    public static final int NOT_GOOD_STUDENTS_LIMIT_UNITS = 16;
+
     public void enroll(Student student, List<CSE> courses) throws EnrollmentRulesViolationException {
         checkForTakingPassedCourses(courses, student);
         checkForPassingAllPrerequisites(courses, student);
@@ -24,9 +30,9 @@ public class EnrollCtrl {
     }
 
     private boolean validatedUnitsRequest(int requested, double gpa) {
-        return (gpa < 12 && requested > 14) ||
-                (gpa < 16 && requested > 16) ||
-                (requested > 20);
+        return (gpa < FAILED_TERM_GPA && requested > FAILED_TERM_LIMIT_UNITS) ||
+                (gpa < GOOD_STUDENT_GPA && requested > NOT_GOOD_STUDENTS_LIMIT_UNITS) ||
+                (requested > UNCONDITIONAL_MAX_UNITS_LIMIT);
     }
 
     private void checkForNotTakingTheSameCourseTwice(List<CSE> courses) throws EnrollmentRulesViolationException {

@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 public class Student {
+	public static final int FAIL_COURSE_GRADE = 10;
 	private String id;
 	private String name;
 
@@ -55,7 +56,7 @@ public class Student {
 	public boolean hasPassed(Course course) {
 		for (Map.Entry<Term, Map<Course, Double>> term : getTranscript().entrySet()) {
 			for (Map.Entry<Course, Double> termCourse : term.getValue().entrySet()) {
-				if (termCourse.getKey().equals(course) && termCourse.getValue() >= 10)
+				if (termCourse.getKey().equals(course) && termCourse.getValue() >= FAIL_COURSE_GRADE)
 					return true;
 			}
 		}
